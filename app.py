@@ -1,10 +1,8 @@
 import streamlit as st
 import pandas as pd
+from fuzzywuzzy import fuzz
 
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_columns', None)
-
-# Read the CSV file into a DataFrame
+# Load the movie data
 df_movies = pd.read_csv('movies.csv')
 
 # Set the title of the app
@@ -16,25 +14,37 @@ movie_title = st.sidebar.text_input("Titre du film")
 # Filter the dataframe to get the row where the `title` column matches the `movie_title`
 selected_movie = df_movies[df_movies['title'] == movie_title]
 
-# Extract the genres from the selected movie
+
+def get_recommendations(movie_title, df_movies, num_recommendations=10):
+    """
+    This function takes a movie title and a DataFrame of movies and returns a list of recommended movie titles based on fuzzy string matching.
+    """
+    # Calculate similarity scores for all movies in the dataframe
+    df_movies['similarity_score'] = df_movies['title'].apply(
+        lambda x: fuzz.ratio(x, movie_title)
+    )
+
+    # Sort movies by similarity score in descending order
+    sorted_movies = df_movies.sort_values(by='similarity_score', ascending=False)
+
+    # Get the top N most similar movies (excluding the input movie itself)
+    recommended_movies = sorted_movies[sorted_movies['title'] != movie_title].head(
+        num_recommendations
+    )
+
+    return recommended_movies[['title', 'language', 'country']]
+
 if not selected_movie.empty:
-    movie_genres = selected_movie['genres'].iloc[0].split(',')
 
-    # Create a new column `genre_match`
-    df_movies['genre_match'] = df_movies['genres'].astype(str).str.contains('|'.join(movie_genres), case=False)
+    recommendations = get_recommendations(movie_title, df_movies)
 
-    # Filter the dataframe to keep only the rows where `genre_match` is True
-    recommended_movies = df_movies[df_movies['genre_match']]
-
-    if not recommended_movies.empty:
-        # Display the genres of the selected movie
-        st.write(f"Genres du film sélectionné : {', '.join(movie_genres)}")
-
-        # Sample 10 movies from the recommended movies and display them
-        st.write(recommended_movies.sample(10)[['title', 'genres', 'language', 'country']].to_markdown(index=False, numalign="left", stralign="left"))
+    if not recommendations.empty:
+        # Display recommended movies
+        st.header('Films recommandés')
+        st.write(recommendations.to_markdown(index=False, numalign="left", stralign="left"))
 
     else:
-        st.write("Aucun film recommandé trouvé pour ces genres.")
+        st.write("Aucun film recommandé trouvé pour ce titre.")
 
 else:
     st.write("Veuillez entrer un titre de film valide.")
