@@ -2,3 +2,5 @@ streamlit
 pandas
 tabulate
 fuzzywuzzy
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import NearestNeighbors
