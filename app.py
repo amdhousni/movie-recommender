@@ -7,6 +7,7 @@ import streamlit as st
 df = pd.read_csv('movies.csv')
 
 # Preprocess the data (encode genres)
+df['genres'] = df['genres'].fillna('')  # Handle missing values in genres
 tfidf = TfidfVectorizer(stop_words='english')
 tfidf_matrix = tfidf.fit_transform(df['genres'])
 
@@ -15,8 +16,12 @@ cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
 
 # Function to get recommendations
 def get_recommendations(title, cosine_sim=cosine_sim):
-    # Find the index of the movie that matches the title
-    idx = df[df['primaryTitle'] == title].index[0]
+    try:
+        # Find the index of the movie that matches the title
+        idx = df[df['primaryTitle'] == title].index[0]
+    except IndexError:
+        st.write("Movie not found in the dataset.")
+        return []
 
     # Get the pairwise similarity scores of all movies with that movie
     sim_scores = list(enumerate(cosine_sim[idx]))
@@ -39,6 +44,9 @@ selected_movie = st.selectbox('Select a movie:', df['primaryTitle'].values)
 
 if st.button('Get Recommendations'):
     recommendations = get_recommendations(selected_movie)
-    st.write('Recommended movies:')
-    for movie in recommendations:
-        st.write(movie)
+    if recommendations:
+        st.write('Recommended movies:')
+        for movie in recommendations:
+            st.write(movie)
+    else:
+        st.write('No recommendations available.')
