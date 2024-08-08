@@ -3,22 +3,22 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import streamlit as st
 
-# Charger les données
+# Load the data
 df = pd.read_csv('movies.csv')
 
-# Prétraitement des données (encoder les genres)
+# Preprocess the data (encode genres)
 tfidf = TfidfVectorizer(stop_words='english')
 tfidf_matrix = tfidf.fit_transform(df['genres'])
 
-# Calculer la similarité entre les films
+# Calculate similarity between movies
 cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
 
-# Fonction pour obtenir des recommandations
+# Function to get recommendations
 def get_recommendations(title, cosine_sim=cosine_sim):
     # Find the index of the movie that matches the title
     idx = df[df['primaryTitle'] == title].index[0]
 
-    # Get the pairwsie similarity scores of all movies with that movie
+    # Get the pairwise similarity scores of all movies with that movie
     sim_scores = list(enumerate(cosine_sim[idx]))
 
     # Sort the movies based on the similarity scores
@@ -33,8 +33,7 @@ def get_recommendations(title, cosine_sim=cosine_sim):
     # Return the top 10 most similar movies
     return df['primaryTitle'].iloc[movie_indices]
 
-
-# Interface Streamlit
+# Streamlit interface
 st.title('Movie Recommender')
 selected_movie = st.selectbox('Select a movie:', df['primaryTitle'].values)
 
