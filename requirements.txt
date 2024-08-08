@@ -2,3 +2,6 @@ streamlit
 pandas
 tabulate
 fuzzywuzzy
+scikit-learn
+NLTK
+Surprise
