@@ -137,16 +137,3 @@ if 'X_scaled' not in globals():
 
 get_recommendations(distance, top_movies, X_scaled, target_column, neighbors_of=['Forrest Gump'], ncols=12)
 
-get_recommendations(distance, top_movies, X_scaled, target_column, neighbors_of=['Jurassic Park'], ncols=12)
-
-# Get recommendations: more than one input #####################################
-# Mean vector with a list
-
-get_recommendations(distance, top_movies, X_scaled, 'primaryTitle', neighbors_of=['Mrs. Doubtfire','The Passion of the Christ'], ncols=12)
-
-get_recommendations(distance, top_movies, X_scaled, target_column, neighbors_of=['Jurassic Park', 'Bridget Jones: The Edge of Reason'], ncols=12)
-
-# Get recommendations: more than one input #####################################
-# Weighted mean vector with a dictionnary
-
-get_recommendations(distance, top_movies, X_scaled, 'primaryTitle', neighbors_of={'Jurassic Park':1, 'Bridget Jones: The Edge of Reason':10}, ncols=12)
