@@ -19,7 +19,7 @@ def get_recommendations(title, cosine_sim=cosine_sim):
     try:
         # Find the index of the movie that matches the title
         idx = df[df['primaryTitle'] == title].index[0]
-        
+
         # Get the pairwise similarity scores of all movies with that movie
         sim_scores = list(enumerate(cosine_sim[idx]))
 
